@@ -2,7 +2,7 @@ require 'tk'
 require 'tkextlib/tkimg'
 
 
-root = TkRoot.new { title "Complex Loading Screen" }
+root = TkRoot.new { title "Loading bunny" }
 root.geometry("600x400") 
 
 
