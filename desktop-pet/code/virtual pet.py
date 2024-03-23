@@ -1,89 +1,102 @@
-import random
 import tkinter as tk
-import pyautogui
+import time
+import random
 
-x = 1400
-cycle = 0
-check = 1
-idle_num =[1,2,3,4]
-sleep_num = [10,11,12,13,15]
-walk_left = [6,7]
-walk_right = [8,9]
-event_number = random.randrange(1,3,1)
-impath = 'bunny.png'
+class Bunny:
+    def __init__(self):
+        # initialize tkinter window
+        self.window = tk.Tk()
+        self.window.config(highlightbackground='purple')
+        self.window.overrideredirect(True)
+        self.window.attributes('-topmost', True)
+        self.window.wm_attributes('-transparentcolor', 'purple')
 
-window = tk.Tk()
+        # load gifs
+        self.load_gifs()
 
-##use this for every animation
-idle_animation = [tk.PhotoImage(file=impath+'idle.gif',format='gif -index %i'%(i))for i in range (x)] #replace x with num frames
-yawn = [tk.PhotoImage(file=impath+'yawn.gif',format='gif -index %i'%(i))for i in range (x)]
-idle_to_sleep = [tk.PhotoImage(file=impath+'idle_to_sleep.gif',format='gif -index %i'%(i))for i in range (x)]
+        # initialize variables
+        self.init_variables()
 
+        # create label for the window
+        self.label = tk.Label(self.window, bd=0, bg='purple')
+        self.label.pack()
 
-sleep = [tk.PhotoImage(file=impath+'sleeping.gif',format='gif -index %i'%(i))for i in range (x)]
-sleep_to_idle = [tk.PhotoImage(file=impath+'wake_up.gif',format='gif -index %i'%(i))for i in range (x)]
+        # dragging variables
+        self.dragging = False
+        self.start_x = 0
+        self.start_y = 0
 
-eat = [tk.PhotoImage(file=impath+'eat.gif',format='gif -index %i'%(i))for i in range (x)]
-eat_to_sleep = [tk.PhotoImage(file=impath+'fall_asleep.gif',format='gif -index %i'%(i))for i in range (x)]
+        # mouse events
+        self.label.bind("<ButtonPress-1>", self.start_drag)
+        self.label.bind("<B1-Motion>", self.drag)
+        self.label.bind("<ButtonRelease-1>", self.release_drag)
 
-walk_forward = [tk.PhotoImage(file=impath+'walk_f.gif',format = 'gif -index %i' %(i)) for i in range(x)
-walk_backward = [tk.PhotoImage(file=impath+'walk_b.gif',format = 'gif -index %i' %(i)) for i in range(x)
+        # start animation
+        self.update()
+        self.window.mainloop()
 
+    def load_gifs(self):
+        self.idle = tk.PhotoImage(file='idle.gif')
+        self.walk_left = [tk.PhotoImage(file='walkleft.gif', format='gif -index %i' % i) for i in range(6)]
+        self.walk_right = [tk.PhotoImage(file='walkright.gif', format='gif -index %i' % i) for i in range(6)]
 
+    def init_variables(self):
+        self.img = self.idle  # initialize img with the idle gif
+        self.y = self.window.winfo_screenheight() - 110  # places in y-dir at bottom of the screen
+        self.x = (self.window.winfo_screenwidth() - 110) / 2  # center horizontally
+        self.vel_x = 0
+        self.vel_y = 0
+        self.gravity = 0.5
+        self.last_change_time = time.time()
 
-##makes background from black to transparent
-window.config(highlightbackground='black')
-window.overideredirect(True)
-window.wm_attributes('-transparentcolor','black')
+    def update(self):
+        self.update_movement()
+        self.update_window()
+        self.window.after(10, self.update)
 
-##assign label to make it movable and animated at the same time
-label = tk.Label(window,bg = 0,bg = 'black')
-label.pack()
-windows.mainloop()
+    def update_movement(self):
+        current_time = time.time()
+        if not self.dragging and current_time > self.last_change_time + 5:
+            self.last_change_time = current_time
+            random_action = random.choice(['idle', 'left', 'right'])
+            if random_action == 'idle':
+                self.img = self.idle
+            elif random_action == 'left':
+                self.img = random.choice(self.walk_left)
+            elif random_action == 'right':
+                self.img = random.choice(self.walk_right)
 
-##loop each gif frame
-def loop(cycle,frames,event_num,first_num,last_num)
-    if (cycle < len(frames)) -1:
-        cycle += 1
+        if not self.dragging:
+            self.vel_y += self.gravity
+            self.y += self.vel_y
 
-def update(cycle,check,event_number,x):
-    ##idle
-    if check == 0:
-        frame = idle[cycle]
-        cycle,event_num = loop(cycle,idle,event_num,1,9)
+            # check if bunny reaches the bottom of the screen
+            if self.y > self.window.winfo_screenheight() - 110:
+                self.y = self.window.winfo_screenheight() - 110
+                self.vel_y = 0
 
-    ##idle to sleep
-    elif check == 1:
-        frame = idle_to_sleep[cycle]
-        cycle,event_num = loop(cycle,idle_to_sleep,event_num,10,10)
+    def update_window(self):
+        self.window.geometry('110x110+{x}+{y}'.format(x=str(int(self.x)), y=str(int(self.y))))
+        self.label.configure(image=self.img)
+        self.label.pack()
 
-    ##sleep
-    elif check == 2:
-        frame = sleep[cycle]
-        cycle,event_num = loop(cycle,sleep,event_num,10,15)
+    def start_drag(self, event):
+        self.dragging = True
+        self.start_x = event.x
+        self.start_y = event.y
 
-    ##sleep to idle
-    elif check == 3:
-        frame = sleep_to_idle[cycle]
-        cycle,event_num = loop(cycle,sleep_to idle,event_num,1,1)
+    def drag(self, event):
+        if self.dragging:
+            self.x += event.x - self.start_x
+            self.y += event.y - self.start_y
+            self.start_x = event.x
+            self.start_y = event.y
 
-    ##walk forward
-    elif check == 4:
-        frame = walk_positive[cycle]
-        cycle,event_num = loop(cycle,walk_forward,event_num,1,9)
-        x -= 3
-        
-    ##walk forward
-    elif check == 5:
-        frame = walk_positive[cycle]
-        cycle,event_num = loop(cycle,walk_backward,event_num,1,9)
-        x -= 3
+    def release_drag(self, event):
+        self.dragging = False
 
-    window.geometry('100x100+'+str(x)+'+1050')
-    label.configure(image=frame)
-    window.after(1,event,cycle,check,event_num,x)
+Bunny()
 
-    
 
         
         
