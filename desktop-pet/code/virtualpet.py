@@ -60,7 +60,7 @@ class Bunny:
         if current_time > self.last_change_time + 7:
             self.last_change_time = current_time
             self.img = self.idle[0]
-            self.action_duration = 5
+            self.action_duration = 10
             self.last_action_time = current_time
 
             if self.current_action is None:
@@ -72,15 +72,15 @@ class Bunny:
                 elif random_action == 2:
                     self.current_action = 'eat'
                     self.img_sequence = self.eat
-                    self.action_duration = 3
+                    self.action_duration = 5
                 elif random_action == 3:
                     self.current_action = 'walk_right'
                     self.img_sequence = self.walk_right
-                    self.action_duration = 3.5
+                    self.action_duration = 5
                 elif random_action == 4:
                     self.current_action = 'walk_left'
                     self.img_sequence = self.walk_left
-                    self.action_duration = 3.5
+                    self.action_duration = 5
                 time.sleep(3)
 
         if not self.dragging:
