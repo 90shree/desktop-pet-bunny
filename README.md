@@ -1,6 +1,7 @@
 # Demo
 
-![Uploading demo.gif…]()
+
+![demo](https://github.com/90shree/desktop-pet-bunny/assets/163702108/98449337-0f59-48c3-8cd1-03ae2e51b6cc)
 
 
 # How to run
