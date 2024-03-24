@@ -1,6 +1,9 @@
+
 import tkinter as tk
 import time
 import random
+import win32api
+import win32gui
 
 class Bunny:
     def __init__(self):
@@ -29,17 +32,18 @@ class Bunny:
         self.window.mainloop()
 
     def load_gifs(self):
-        self.sleep = [tk.PhotoImage(file='sleep.gif', format='gif -index %i' % i) for i in range(7)]
-        self.eat = [tk.PhotoImage(file='eat.gif', format='gif -index %i' % i) for i in range(14)]
-        self.walk_left = [tk.PhotoImage(file='walkleft.gif', format='gif -index %i' % i) for i in range(6)]
-        self.walk_right = [tk.PhotoImage(file='walkright.gif', format='gif -index %i' % i) for i in range(6)]
-        self.idle = [tk.PhotoImage(file='idle.gif', format='gif -index %i' % i) for i in range(2)]
-        self.idle_to_sleep = [tk.PhotoImage(file='idle_to_sleep.gif', format='gif -index %i' % i) for i in range(7)]
+        self.sleep = [tk.PhotoImage(file='C:/Users/School/Desktop/desktop_pet/animations/sleep.gif', format='gif -index %i' % i) for i in range(7)]
+        self.eat = [tk.PhotoImage(file='C:/Users/School/Desktop/desktop_pet/animations/eat.gif', format='gif -index %i' % i) for i in range(14)]
+        self.walk_left = [tk.PhotoImage(file='C:/Users/School/Desktop/desktop_pet/animations/walkleft.gif', format='gif -index %i' % i) for i in range(6)]
+        self.walk_right = [tk.PhotoImage(file='C:/Users/School/Desktop/desktop_pet/animations/walkright.gif', format='gif -index %i' % i) for i in range(6)]
+        self.idle = [tk.PhotoImage(file='C:/Users/School/Desktop/desktop_pet/animations/idle.gif', format='gif -index %i' % i) for i in range(2)]
+        self.idle_to_sleep = [tk.PhotoImage(file='C:/Users/School/Desktop/desktop_pet/animations/idle_to_sleep.gif', format='gif -index %i' % i) for i in range(7)]
 
     def init_variables(self):
         self.current_action = None
         self.img = self.idle[0]
-        self.y = self.window.winfo_screenheight() - 110
+        self.taskbar_height = self.get_taskbar_height()
+        self.y = self.window.winfo_screenheight() - self.taskbar_height - 110
         self.x = (self.window.winfo_screenwidth() - 110) / 2
         self.vel_x = 0
         self.vel_y = 0
@@ -48,6 +52,12 @@ class Bunny:
         self.last_change_time = time.time()
         self.action_duration = 0
         self.moving_back = False
+
+    def get_taskbar_height(self):
+        hwnd = win32gui.FindWindow("Shell_traywnd", None)
+        rect = win32gui.GetWindowRect(hwnd)
+        return rect[3] - rect[1]
+
 
     def update(self):
         self.update_movement()
@@ -60,7 +70,7 @@ class Bunny:
         if current_time > self.last_change_time + 7 and not self.moving_back:
             self.last_change_time = current_time
             self.img = self.idle[0]
-            self.action_duration = 7
+            self.action_duration = 5
             self.last_action_time = current_time
 
             if self.current_action is None or self.current_action == 'idle':
@@ -72,19 +82,19 @@ class Bunny:
                 elif random_action == 2:
                     self.current_action = 'eat'
                     self.img_sequence = self.eat
-                    self.action_duration = 8
+                    self.action_duration = 1
                 elif random_action == 3 or random_action == 4:
                     direction = 'walk_right' if random_action == 3 else 'walk_left'
                     self.start_walking(direction)
-                    self.action_duration = 7
-                time.sleep(4)
+                    self.action_duration = 9
+                time.sleep(10)
 
         if not self.dragging:
             self.vel_y += self.gravity
             self.y += self.vel_y
 
-            if self.y > self.window.winfo_screenheight() - 110:
-                self.y = self.window.winfo_screenheight() - 110
+            if self.y > self.window.winfo_screenheight() - 110 - self.taskbar_height:
+                self.y = self.window.winfo_screenheight() - 110 - self.taskbar_height
                 self.vel_y = 0
 
         if hasattr(self, 'img_sequence'):
@@ -117,7 +127,7 @@ class Bunny:
     def start_moving_back(self, direction):
         self.moving_back = True
         self.start_walking('walk_right' if direction == 'right' else 'walk_left')
-        self.action_duration = 2
+        self.action_duration = 5
 
     def update_window(self):
         self.window.geometry('110x110+{x}+{y}'.format(x=str(int(self.x)), y=str(int(self.y))))
