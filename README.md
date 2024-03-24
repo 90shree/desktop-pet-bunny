@@ -6,10 +6,9 @@
 A desktop pet bunny companion created with Python! It eats carrots, sleeps, and walks at random intervals across the bottom of your screen. 
 
 # How was it made?
-The program is essentially a series of gif-animations ontop of a fitted transparent window, made with the help of the Python module "tkinter" to manipulate GUI aspects of the window. Object Oriented Programming was also used to define the window as its own class.
-Each animation was also drawn by hand using a pixel-art program, then converted into readable gif files. 
+The program is essentially a series of gif-animations ontop of a fitted transparent window, made with the help of the Python module "tkinter" to manipulate GUI aspects of the window. Object Oriented Programming was used to define the window as its own class, and each animation was also drawn by hand using a pixel-art program, then converted into readable gif files. 
 
-Gravity/Drop physics was implemented through declaring variables for velocty, acceleration and gravity.. then adding the gravity variable to the y-velocity (using a plus-equals operator) when the user is not dragging the window, and applying this logic to both acceleration and velocity as well.
+Gravity/Drop physics was implemented through declaring variables for velocity, acceleration and gravity.. then adding the gravity variable to the y-velocity (using a plus-equals operator) when the user is not dragging the window, and applying this logic to both acceleration and velocity as well.
 
 
 
