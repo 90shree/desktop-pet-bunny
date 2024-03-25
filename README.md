@@ -14,4 +14,5 @@ Gravity/Drop physics was implemented through declaring variables for velocity, a
 
 # How to run
 Simply extract the 'Bunny.zip' file and run the python executable :)
+
 ***Right click the bunny and select "Close Bunny" to close the program!*
