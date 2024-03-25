@@ -16,3 +16,23 @@ Gravity/Drop physics was implemented through declaring variables for velocity, a
 Simply extract the 'Bunny.zip' file and run the python executable :)
 
 ***Right click the bunny and select "Close Bunny" to close the program!*
+
+# If, for any reason, this is not possible:
+
+## 1. Ensure that you have Python 3 installed.
+
+## 2. Install the necessary modules needed to run this program with the following commands:
+
+'pip install tk'
+
+'pip install win32gui'
+
+'pip install win32com'
+
+'pip install random'
+
+## 3. Now you can run the program in Command prompt by:
+
+First changing the directory to where this program is stored by using the 'cd' command, followed by a space, then your directory.
+
+Then simply the command, "Bunny.py"
