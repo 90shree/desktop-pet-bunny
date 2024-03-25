@@ -19,6 +19,8 @@ Simply extract the 'Bunny.zip' file and run the python executable :)
 
 # If, for any reason, this is not possible:
 
+You will have to run the program using the assets in the "manual program" folder. Follow the steps below to do so.
+
 ## 1. Ensure that you have Python 3 installed.
 
 ## 2. Install the necessary modules needed to run this program with the following commands:
