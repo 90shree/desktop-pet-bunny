@@ -93,9 +93,8 @@ class Bunny:
             elif self.y < self.default_y and not self.is_falling:
                 self.is_falling = True
                 self.current_action = 'fall'
-                self.img_sequence = self.fall  # Assign fall animation frames
+                self.img_sequence = self.fall
                 self.action_duration = len(self.fall) * 100
-                # Set action duration for fall animation
             
         if hasattr(self, 'img_sequence') and self.current_action:
             num_frames = len(self.img_sequence)
@@ -126,7 +125,7 @@ class Bunny:
 
             self.last_action_time = current_time
 
-        # Walking and moving back logic
+        # movement
         if self.current_action == 'walkright':
             if not self.moving_back and self.x > self.window.winfo_screenwidth() - 110:
                 self.start_moving_back('left')
@@ -142,8 +141,7 @@ class Bunny:
     def start_walking(self, direction):
         self.current_action = direction
         self.img_sequence = self.walk_right if direction == 'walkright' else self.walk_left
-        self.action_duration = random.randint(5, 7) * len(self.img_sequence) * 0.1  # Adjust duration based on the number of frames and assumed frame rate
-
+        self.action_duration = random.randint(5, 7) * len(self.img_sequence) * 0.1 
     def start_moving_back(self, direction):
         self.moving_back = True
         self.start_walking('walkright' if direction == 'right' else 'walkleft')
@@ -164,12 +162,10 @@ class Bunny:
             self.y = event.y_root - self.start_y + self.y
             self.start_x = event.x_root
             self.start_y = event.y_root
-            # Ensure that we stop any ongoing actions like walking or eating during drag
             self.current_action = None
-            self.is_falling = False  # We also reset the falling status to prevent from switching to the fall animation
+            self.is_falling = False 
 
     def release_drag(self, event):
         self.dragging = False
-        # No need to manually set to fall here; it will be handled in update_movement based on y position and velocity
 
 Bunny()
