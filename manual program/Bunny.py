@@ -1,7 +1,6 @@
 import tkinter as tk
 import time
 import random
-import win32api
 import win32gui
 
 class Bunny:
@@ -27,7 +26,6 @@ class Bunny:
         self.label.bind("<B1-Motion>", self.drag)
         self.label.bind("<ButtonRelease-1>", self.release_drag)
 
-        # Bind right-click event for the option to close the program
         self.label.bind("<Button-3>", self.right_click_menu)
 
         self.update()
@@ -38,22 +36,25 @@ class Bunny:
         self.eat = [tk.PhotoImage(file='eat.gif', format='gif -index %i' % i) for i in range(14)]
         self.walk_left = [tk.PhotoImage(file='walkleft.gif', format='gif -index %i' % i) for i in range(6)]
         self.walk_right = [tk.PhotoImage(file='walkright.gif', format='gif -index %i' % i) for i in range(6)]
-        self.idle = [tk.PhotoImage(file='idle.gif', format='gif -index %i' % i) for i in range(2)]
-        self.idle_to_sleep = [tk.PhotoImage(file='idle_to_sleep.gif', format='gif -index %i' % i) for i in range(7)]
+        self.idle = [tk.PhotoImage(file='idle.gif', format='gif -index %i' % i) for i in range(1)]
+        self.fall = [tk.PhotoImage(file='fall.gif', format='gif -index %i' % i) for i in range(1)]
+
 
     def init_variables(self):
         self.current_action = None
         self.img = self.idle[0]
         self.taskbar_height = self.get_taskbar_height()
-        self.y = self.window.winfo_screenheight() - self.taskbar_height - 110
+        self.default_y = self.window.winfo_screenheight() - self.taskbar_height - 110
+        self.y = self.default_y
         self.x = (self.window.winfo_screenwidth() - 110) / 2
         self.vel_x = 0
         self.vel_y = 0
-        self.gravity = 0.981
+        self.gravity = 0.181
         self.last_action_time = time.time()
         self.last_change_time = time.time()
         self.action_duration = 0
         self.moving_back = False
+        self.is_falling = False 
 
     def get_taskbar_height(self):
         hwnd = win32gui.FindWindow("Shell_traywnd", None)
@@ -78,67 +79,74 @@ class Bunny:
 
     def update_movement(self):
         current_time = time.time()
-
-        if current_time > self.last_change_time + 7 and not self.moving_back:
-            self.last_change_time = current_time
-            self.img = self.idle[0]
-            self.action_duration = 5
-            self.last_action_time = current_time
-
-            if self.current_action is None or self.current_action == 'idle':
-                random_action = random.randint(1, 4)
-                if random_action == 1:
-                    self.current_action = 'sleep'
-                    self.img_sequence = self.sleep
-                    self.action_duration = 7
-                elif random_action == 2:
-                    self.current_action = 'eat'
-                    self.img_sequence = self.eat
-                    self.action_duration = 1
-                elif random_action == 3 or random_action == 4:
-                    direction = 'walk_right' if random_action == 3 else 'walk_left'
-                    self.start_walking(direction)
-                    self.action_duration = 9
-                time.sleep(10)
-
+        
         if not self.dragging:
             self.vel_y += self.gravity
             self.y += self.vel_y
-
-            if self.y > self.window.winfo_screenheight() - 110 - self.taskbar_height:
-                self.y = self.window.winfo_screenheight() - 110 - self.taskbar_height
+            if self.y >= self.default_y:
+                self.y = self.default_y
                 self.vel_y = 0
-
-        if hasattr(self, 'img_sequence'):
+                if self.is_falling:
+                    self.current_action = 'idle'
+                    self.img_sequence = self.idle
+                    self.is_falling = False
+            elif self.y < self.default_y and not self.is_falling:
+                self.is_falling = True
+                self.current_action = 'fall'
+                self.img_sequence = self.fall  # Assign fall animation frames
+                self.action_duration = len(self.fall) * 100
+                # Set action duration for fall animation
+            
+        if hasattr(self, 'img_sequence') and self.current_action:
             num_frames = len(self.img_sequence)
-            elapsed_time = current_time - self.last_action_time
-            frame_index = int((elapsed_time / 0.1) % num_frames)
+            frame_index = int(((current_time - self.last_action_time) / 0.1) % num_frames)
             self.img = self.img_sequence[frame_index]
 
-            if self.current_action == 'walk_right':
-                if not self.moving_back and self.x > self.window.winfo_screenwidth() - 110:
-                    self.start_moving_back('left')
-                else:
-                    self.x += 1
-            elif self.current_action == 'walk_left':
-                if not self.moving_back and self.x < 0:
-                    self.start_moving_back('right')
-                else:
-                    self.x -= 1
-
         if current_time > self.last_action_time + self.action_duration:
-            self.current_action = None
-            self.img = self.idle[0]
-            self.moving_back = False
+            self.current_action = 'idle'
+            self.img_sequence = self.idle 
+            self.action_duration = 0
+            self.last_action_time = current_time 
+        
+        if current_time > self.last_change_time + 7 and not self.moving_back and self.current_action in ['idle', None] and not self.is_falling:
+            self.last_change_time = current_time
+            random_action = random.randint(1, 4)
+            if random_action == 1:
+                self.current_action = 'sleep'
+                self.img_sequence = self.sleep
+                self.action_duration = len(self.sleep) * 1 
+            elif random_action == 2:
+                self.current_action = 'eat'
+                self.img_sequence = self.eat
+                self.action_duration = len(self.eat) * 1
+            elif random_action == 3 or random_action == 4:
+                direction = 'walkright' if random_action == 3 else 'walkleft'
+                self.start_walking(direction)
+                self.action_duration = 9  
+
+            self.last_action_time = current_time
+
+        # Walking and moving back logic
+        if self.current_action == 'walkright':
+            if not self.moving_back and self.x > self.window.winfo_screenwidth() - 110:
+                self.start_moving_back('left')
+            else:
+                self.x += 1
+        elif self.current_action == 'walkleft':
+            if not self.moving_back and self.x < 0:
+                self.start_moving_back('right')
+            else:
+                self.x -= 1
+
 
     def start_walking(self, direction):
         self.current_action = direction
-        self.img_sequence = self.walk_right if direction == 'walk_right' else self.walk_left
-        self.action_duration = random.randint(5, 7)
+        self.img_sequence = self.walk_right if direction == 'walkright' else self.walk_left
+        self.action_duration = random.randint(5, 7) * len(self.img_sequence) * 0.1  # Adjust duration based on the number of frames and assumed frame rate
 
     def start_moving_back(self, direction):
         self.moving_back = True
-        self.start_walking('walk_right' if direction == 'right' else 'walk_left')
+        self.start_walking('walkright' if direction == 'right' else 'walkleft')
         self.action_duration = 5
 
     def update_window(self):
@@ -156,8 +164,12 @@ class Bunny:
             self.y = event.y_root - self.start_y + self.y
             self.start_x = event.x_root
             self.start_y = event.y_root
+            # Ensure that we stop any ongoing actions like walking or eating during drag
+            self.current_action = None
+            self.is_falling = False  # We also reset the falling status to prevent from switching to the fall animation
 
     def release_drag(self, event):
         self.dragging = False
+        # No need to manually set to fall here; it will be handled in update_movement based on y position and velocity
 
 Bunny()
