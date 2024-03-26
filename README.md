@@ -1,6 +1,7 @@
 # Demo
 
-![bunnydemo](https://github.com/90shree/desktop-pet-bunny/assets/163702108/7bf33e28-764e-40cd-924d-30f209032927)
+
+![bunnydem](https://github.com/90shree/desktop-pet-bunny/assets/163702108/325934ec-7794-438a-9681-87c2b30025e0)
 
 
 A desktop pet bunny companion created with Python! It eats carrots, sleeps, and walks at random intervals across the bottom of your screen. 
